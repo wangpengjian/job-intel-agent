@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.omx/
+.DS_Store
+*.log
+public/data/jobs/latest.json
