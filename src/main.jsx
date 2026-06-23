@@ -12,6 +12,7 @@ import {
   Filter,
   GraduationCap,
   LineChart,
+  RotateCcw,
   MapPin,
   Search,
   ShieldCheck,
@@ -393,11 +394,13 @@ function LiveSearchBox({ onLoad }) {
 
   return (
     <aside className="live-box">
-      <div className="section-title">
-        <Wifi size={18} />
-        <h3>MCP 真实搜索</h3>
+      <div className="live-search-head">
+        <div className="section-title">
+          <Wifi size={18} />
+          <h3>MCP 真实搜索</h3>
+        </div>
+        <p>从招聘平台抓取真实岗位，结果会自动加入左侧列表。</p>
       </div>
-      <p>直接从前端触发本地 MCP 抓取，拿到真实岗位后自动加入列表。</p>
       <div className="live-form">
         <label>
           <span>关键词</span>
@@ -417,9 +420,10 @@ function LiveSearchBox({ onLoad }) {
         {loading ? '搜索中...' : '开始真实搜索'}
       </button>
       <button className="secondary-button" disabled={loading} onClick={handleLoadLatest} type="button">
+        <RotateCcw size={17} />
         加载最近一次结果
       </button>
-      {status && <p className={status.startsWith('已') ? 'import-message success' : 'import-message error'}>{status}</p>}
+      {status && <p className={status.startsWith('已') ? 'live-status success' : 'live-status error'}>{status}</p>}
     </aside>
   );
 }
@@ -470,6 +474,12 @@ function App() {
     setOwnership('全部');
   }
 
+  function clearListFilters() {
+    setQuery('');
+    setPlatform('全部');
+    setOwnership('全部');
+  }
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -489,19 +499,7 @@ function App() {
       </header>
 
       <section className="search-band">
-        <div className="search-box">
-          <Search size={20} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="输入方向、岗位、城市或技能，例如：上海 AI 产品 RAG" />
-        </div>
-        <div className="filters">
-          <Filter size={18} />
-          <select value={platform} onChange={(event) => setPlatform(event.target.value)}>
-            {platforms.map((item) => <option key={item}>{item}</option>)}
-          </select>
-          <select value={ownership} onChange={(event) => setOwnership(event.target.value)}>
-            {ownerships.map((item) => <option key={item}>{item}</option>)}
-          </select>
-        </div>
+        <LiveSearchBox onLoad={handleLoadLiveJobs} />
       </section>
 
       <section className="summary-strip">
@@ -516,6 +514,30 @@ function App() {
           <div className="rail-title">
             <h2>岗位列表</h2>
             <span>按推荐度排序</span>
+          </div>
+          <div className="list-filter-box">
+            <div className="filter-head">
+              <span>筛选当前列表</span>
+              <button onClick={clearListFilters} type="button">重置</button>
+            </div>
+            <div className="search-box">
+              <Search size={18} />
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="岗位、公司、技能" />
+            </div>
+            <div className="filter-fields">
+              <label>
+                <span>来源</span>
+                <select value={platform} onChange={(event) => setPlatform(event.target.value)}>
+                  {platforms.map((item) => <option key={item}>{item}</option>)}
+                </select>
+              </label>
+              <label>
+                <span>性质</span>
+                <select value={ownership} onChange={(event) => setOwnership(event.target.value)}>
+                  {ownerships.map((item) => <option key={item}>{item}</option>)}
+                </select>
+              </label>
+            </div>
           </div>
           <div className="job-list">
             {enrichedJobs.map((job) => (
@@ -544,7 +566,6 @@ function App() {
         </section>
 
         <div className="right-rail">
-          <LiveSearchBox onLoad={handleLoadLiveJobs} />
           <ImportBox onImport={handleImport} />
         </div>
       </div>
